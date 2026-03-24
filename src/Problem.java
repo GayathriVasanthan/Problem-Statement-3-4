@@ -1,58 +1,45 @@
 import java.util.*;
 
 public class Problem {
-    public static int linearFirst(String[] logs, String target) {
+    public static void linearSearch(int[] risks, int target) {
         int comparisons = 0;
-        for (int i = 0; i < logs.length; i++) {
+        boolean found = false;
+        for (int i = 0; i < risks.length; i++) {
             comparisons++;
-            if (logs[i].equals(target)) {
-                System.out.println("Linear first " + target + ": index " + i + " (" + comparisons + " comparisons)");
-                return i;
+            if (risks[i] == target) {
+                found = true;
+                System.out.println("Linear: threshold=" + target + " → found at index " + i + " (" + comparisons + " comps)");
+                break;
             }
         }
-        System.out.println("Linear first " + target + ": not found (" + comparisons + " comparisons)");
-        return -1;
+        if (!found) System.out.println("Linear: threshold=" + target + " → not found (" + comparisons + " comps)");
     }
 
-    public static int linearLast(String[] logs, String target) {
-        int comparisons = 0;
-        for (int i = logs.length - 1; i >= 0; i--) {
-            comparisons++;
-            if (logs[i].equals(target)) {
-                System.out.println("Linear last " + target + ": index " + i + " (" + comparisons + " comparisons)");
-                return i;
-            }
-        }
-        System.out.println("Linear last " + target + ": not found (" + comparisons + " comparisons)");
-        return -1;
-    }
-
-    public static int[] binarySearch(String[] logs, String target) {
-        int comparisons = 0;
-        int low = 0, high = logs.length - 1;
-        int index = -1;
-        Arrays.sort(logs);
+    public static void binaryFloorCeiling(int[] risks, int target) {
+        int low = 0, high = risks.length - 1, comparisons = 0;
+        int floor = -1, ceiling = -1;
         while (low <= high) {
             int mid = (low + high) / 2;
             comparisons++;
-            if (logs[mid].equals(target)) {
-                index = mid;
+            if (risks[mid] == target) {
+                floor = ceiling = risks[mid];
                 break;
-            } else if (logs[mid].compareTo(target) < 0) low = mid + 1;
-            else high = mid - 1;
+            } else if (risks[mid] < target) {
+                floor = risks[mid];
+                low = mid + 1;
+            } else {
+                ceiling = risks[mid];
+                high = mid - 1;
+            }
         }
-        int count = 0;
-        for (String s : logs) if (s.equals(target)) count++;
-        System.out.println("Binary " + target + ": index " + index + " (" + comparisons + " comparisons), count=" + count);
-        return new int[]{index, count};
+        System.out.println("Binary floor(" + target + "): " + floor + ", ceiling: " + ceiling + " (" + comparisons + " comps)");
     }
 
     public static void main(String[] args) {
-        String[] logs = {"accB", "accA", "accB", "accC"};
+        int[] risks = {10, 25, 50, 100};
+        int target = 30;
 
-        linearFirst(logs, "accB");
-        linearLast(logs, "accB");
-
-        binarySearch(logs, "accB");
+        linearSearch(risks, target);
+        binaryFloorCeiling(risks, target);
     }
 }
