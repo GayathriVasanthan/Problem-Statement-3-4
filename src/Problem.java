@@ -1,82 +1,58 @@
 import java.util.*;
 
-class Asset {
-    String id;
-    double returnRate;
-    double volatility;
-    public Asset(String id, double returnRate, double volatility) {
-        this.id = id;
-        this.returnRate = returnRate;
-        this.volatility = volatility;
-    }
-    public String toString() {
-        return id + ":" + returnRate + "%";
-    }
-}
-
 public class Problem {
-    public static void mergeSort(Asset[] assets) {
-        if (assets.length <= 1) return;
-        int mid = assets.length / 2;
-        Asset[] left = Arrays.copyOfRange(assets, 0, mid);
-        Asset[] right = Arrays.copyOfRange(assets, mid, assets.length);
-        mergeSort(left);
-        mergeSort(right);
-        merge(assets, left, right);
-    }
-
-    public static void merge(Asset[] assets, Asset[] left, Asset[] right) {
-        int i = 0, j = 0, k = 0;
-        while (i < left.length && j < right.length) {
-            if (left[i].returnRate <= right[j].returnRate) assets[k++] = left[i++];
-            else assets[k++] = right[j++];
-        }
-        while (i < left.length) assets[k++] = left[i++];
-        while (j < right.length) assets[k++] = right[j++];
-    }
-
-    public static void quickSortDescReturnAscVol(Asset[] assets, int low, int high) {
-        if (low < high) {
-            int pi = partition(assets, low, high);
-            quickSortDescReturnAscVol(assets, low, pi - 1);
-            quickSortDescReturnAscVol(assets, pi + 1, high);
-        }
-    }
-
-    public static int partition(Asset[] assets, int low, int high) {
-        Asset pivot = assets[high];
-        int i = low - 1;
-        for (int j = low; j < high; j++) {
-            if (assets[j].returnRate > pivot.returnRate ||
-                    (assets[j].returnRate == pivot.returnRate && assets[j].volatility < pivot.volatility)) {
-                i++;
-                Asset temp = assets[i];
-                assets[i] = assets[j];
-                assets[j] = temp;
+    public static int linearFirst(String[] logs, String target) {
+        int comparisons = 0;
+        for (int i = 0; i < logs.length; i++) {
+            comparisons++;
+            if (logs[i].equals(target)) {
+                System.out.println("Linear first " + target + ": index " + i + " (" + comparisons + " comparisons)");
+                return i;
             }
         }
-        Asset temp = assets[i + 1];
-        assets[i + 1] = assets[high];
-        assets[high] = temp;
-        return i + 1;
+        System.out.println("Linear first " + target + ": not found (" + comparisons + " comparisons)");
+        return -1;
+    }
+
+    public static int linearLast(String[] logs, String target) {
+        int comparisons = 0;
+        for (int i = logs.length - 1; i >= 0; i--) {
+            comparisons++;
+            if (logs[i].equals(target)) {
+                System.out.println("Linear last " + target + ": index " + i + " (" + comparisons + " comparisons)");
+                return i;
+            }
+        }
+        System.out.println("Linear last " + target + ": not found (" + comparisons + " comparisons)");
+        return -1;
+    }
+
+    public static int[] binarySearch(String[] logs, String target) {
+        int comparisons = 0;
+        int low = 0, high = logs.length - 1;
+        int index = -1;
+        Arrays.sort(logs);
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            comparisons++;
+            if (logs[mid].equals(target)) {
+                index = mid;
+                break;
+            } else if (logs[mid].compareTo(target) < 0) low = mid + 1;
+            else high = mid - 1;
+        }
+        int count = 0;
+        for (String s : logs) if (s.equals(target)) count++;
+        System.out.println("Binary " + target + ": index " + index + " (" + comparisons + " comparisons), count=" + count);
+        return new int[]{index, count};
     }
 
     public static void main(String[] args) {
-        Asset[] assets = {
-                new Asset("AAPL", 12, 0.3),
-                new Asset("TSLA", 8, 0.5),
-                new Asset("GOOG", 15, 0.2)
-        };
+        String[] logs = {"accB", "accA", "accB", "accC"};
 
-        mergeSort(assets);
-        System.out.println("MergeSort (asc returnRate): " + Arrays.toString(assets));
+        linearFirst(logs, "accB");
+        linearLast(logs, "accB");
 
-        Asset[] assetsQuick = {
-                new Asset("AAPL", 12, 0.3),
-                new Asset("TSLA", 8, 0.5),
-                new Asset("GOOG", 15, 0.2)
-        };
-        quickSortDescReturnAscVol(assetsQuick, 0, assetsQuick.length - 1);
-        System.out.println("QuickSort (desc return + asc volatility): " + Arrays.toString(assetsQuick));
+        binarySearch(logs, "accB");
     }
 }
