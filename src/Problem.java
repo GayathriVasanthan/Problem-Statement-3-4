@@ -1,27 +1,29 @@
 import java.util.*;
 
-class Transaction {
+class Client {
     String id;
-    double fee;
-    String timestamp;
-    public Transaction(String id, double fee, String timestamp) {
+    int riskScore;
+    double accountBalance;
+    public Client(String id, int riskScore, double accountBalance) {
         this.id = id;
-        this.fee = fee;
-        this.timestamp = timestamp;
+        this.riskScore = riskScore;
+        this.accountBalance = accountBalance;
     }
     public String toString() {
-        return id + ":" + fee + "@" + timestamp;
+        return id + ":" + riskScore;
     }
 }
 
 public class Problem {
-    public static void bubbleSortFee(List<Transaction> transactions) {
-        int n = transactions.size();
+    public static void bubbleSortRiskScoreAsc(Client[] clients) {
+        int n = clients.length;
         for (int i = 0; i < n - 1; i++) {
             boolean swapped = false;
             for (int j = 0; j < n - i - 1; j++) {
-                if (transactions.get(j).fee > transactions.get(j + 1).fee) {
-                    Collections.swap(transactions, j, j + 1);
+                if (clients[j].riskScore > clients[j + 1].riskScore) {
+                    Client temp = clients[j];
+                    clients[j] = clients[j + 1];
+                    clients[j + 1] = temp;
                     swapped = true;
                 }
             }
@@ -29,40 +31,37 @@ public class Problem {
         }
     }
 
-    public static void insertionSortFeeTimestamp(List<Transaction> transactions) {
-        for (int i = 1; i < transactions.size(); i++) {
-            Transaction key = transactions.get(i);
+    public static void insertionSortRiskScoreDescAccountBalanceAsc(Client[] clients) {
+        for (int i = 1; i < clients.length; i++) {
+            Client key = clients[i];
             int j = i - 1;
-            while (j >= 0 && (transactions.get(j).fee > key.fee ||
-                    (transactions.get(j).fee == key.fee && transactions.get(j).timestamp.compareTo(key.timestamp) > 0))) {
-                transactions.set(j + 1, transactions.get(j));
+            while (j >= 0 && (clients[j].riskScore < key.riskScore ||
+                    (clients[j].riskScore == key.riskScore && clients[j].accountBalance > key.accountBalance))) {
+                clients[j + 1] = clients[j];
                 j--;
             }
-            transactions.set(j + 1, key);
+            clients[j + 1] = key;
         }
-    }
-
-    public static List<Transaction> flagHighFee(List<Transaction> transactions, double threshold) {
-        List<Transaction> outliers = new ArrayList<>();
-        for (Transaction t : transactions) {
-            if (t.fee > threshold) outliers.add(t);
-        }
-        return outliers;
     }
 
     public static void main(String[] args) {
-        List<Transaction> transactions = new ArrayList<>();
-        transactions.add(new Transaction("id1", 10.5, "10:00"));
-        transactions.add(new Transaction("id2", 25.0, "09:30"));
-        transactions.add(new Transaction("id3", 5.0, "10:15"));
+        Client[] clients = {
+                new Client("clientC", 80, 5000),
+                new Client("clientA", 20, 10000),
+                new Client("clientB", 50, 7000)
+        };
 
-        bubbleSortFee(transactions);
-        System.out.println("BubbleSort (fees): " + transactions);
+        bubbleSortRiskScoreAsc(clients);
+        System.out.println("BubbleSort (asc): " + Arrays.toString(clients));
 
-        insertionSortFeeTimestamp(transactions);
-        System.out.println("InsertionSort (fee+ts): " + transactions);
+        insertionSortRiskScoreDescAccountBalanceAsc(clients);
+        System.out.println("InsertionSort (desc risk + asc balance): " + Arrays.toString(clients));
 
-        List<Transaction> outliers = flagHighFee(transactions, 50.0);
-        System.out.println("High-fee outliers: " + outliers);
+        System.out.print("Top 3 risks: ");
+        for (int i = 0; i < Math.min(3, clients.length); i++) {
+            System.out.print(clients[i].id + "(" + clients[i].riskScore + ")");
+            if (i < Math.min(3, clients.length) - 1) System.out.print(", ");
+        }
+        System.out.println();
     }
 }
